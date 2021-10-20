@@ -14,5 +14,14 @@ module.exports = async (req, res) => {
       },
     })
 
+    await prisma.category.update({
+      where: {
+        id: newNotes.categoryId
+      },
+      data: {
+        updatedAt: new Date()
+      }
+    })
+
   res.json(newNotes)
 }

@@ -1,44 +1,47 @@
 <template>
   <div>
-    <div class="title">
-      <div class="line"></div>
-      <h1>todo <span class="light">list</span></h1>
-      <div class="line"></div>
+    <Header />
+
+    <div class="content">
+      <div class="title">
+        <div class="line"></div>
+        <h1>todo <span class="light">list</span></h1>
+        <div class="line"></div>
+      </div>
+
+      <div v-for="category in sortedArray" class="list-item" :key="category.id">
+        <div class="list" :style="{backgroundColor:category.color}">
+          <nuxt-link :to="{path: `/category/${category.id}`}">
+            <h4 class="list-title">{{category.title}}</h4>
+            <p class="list-description">{{category.description}}</p>
+          </nuxt-link>
+        </div>
+      </div>
+
+      <div class="list add-list">
+        <input type="text" name="newlist-title" id="newlist-title" placeholder="Nouvelle catégorie" v-model="nameInput">
+        <textarea placeholder="Description..." name="newlist-description" id="newlist-description" cols="30" rows="3"
+          v-model="descriptionInput"></textarea>
+        <p>Couleur:</p>
+        <ColorPicker v-model="colorInput" />
+        <div class="submitter">
+          <button class="add-button" @click.prevent="createCategory">Ajouter</button>
+        </div>
+      </div>
+
+      <div class="add-icon" @click.prevent="createCategory">
+      </div>
     </div>
 
-    <div v-for="category in categories" :key="category.id" class="list" :style="{backgroundColor:category.color}"><nuxt-link :to="{path: `/category/${category.id}`}">
-      <h4 class="list-title">{{category.title}}</h4>
-      <p class="list-description">{{category.description}}</p></nuxt-link>
-    </div>
-
-    <div class="add-list list">
-      <input type="text" name="newlist-title" id="newlist-title" placeholder="Nouvelle catégorie" v-model="nameInput">
-      <textarea placeholder="Description..." name="newlist-description" id="newlist-description" cols="30"
-        rows="3" v-model="descriptionInput"></textarea>
-      <p>Couleur:</p>
-      <ColorPicker v-model="colorInput" />
-    </div>
-
-
-    <div class="add-icon" @click.prevent="createCategory">
-      <svg aria-hidden="true" width="30px" height="30px" focusable="false" data-prefix="fas" data-icon="plus"
-        class="svg-inline--fa fa-plus fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-        <path fill="#fff"
-          d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z">
-        </path>
-      </svg>
-    </div>
   </div>
 </template>
 
 <style lang="scss">
-
   .list {
     background-color: #1e3799;
     color: white;
     padding: 20px;
     border-radius: 10px;
-    margin-top: 40px;
     box-shadow: 0px ​5px 6px 3px rgba(0, 0, 0, 0.2);
 
     .list-title {
@@ -55,22 +58,22 @@
     }
   }
 
-  .add-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 30px;
-    padding: 5px;
-    background-color: #585858;
-    position: absolute;
-    bottom: 5%;
-    right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background .3s ease;
+  .list-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-content: center;
+    margin-top: 40px;
 
-    &:active {
-      background-color: #4d4c4c;
+
+    .delete-button {
+      background-color: #ff6b6b;
+      border-radius: 10px;
+      color: white;
+      display: none;
+
+      &:active {
+        background-color: #633737;
+      }
     }
   }
 
@@ -95,9 +98,31 @@
   .add-list {
     background-color: #f3f3f3;
     color: #585858;
+    margin-top: 40px;
 
     h4 {
       color: #585858;
+    }
+
+    .submitter {
+      width: 100%;
+      display: grid;
+      justify-items: center;
+
+      .add-button {
+        border-radius: 10px;
+        color: white;
+        padding: .5em .8em;
+        text-align: center;
+        font-size: 1em;
+        margin-top: 1em;
+        background-color: #585858;
+        transition: background .3s ease;
+
+        &:active {
+          background-color: #4d4c4c;
+        }
+      }
     }
   }
 
@@ -105,7 +130,7 @@
 
 <script>
   export default {
-    layout: 'main',
+    transition: 'slide-right',
 
     async asyncData({
       $axios
@@ -117,9 +142,14 @@
     },
     data() {
       return {
-        nameInput : "",
-        descriptionInput : "",
-        colorInput : "",
+        nameInput: "",
+        descriptionInput: "",
+        colorInput: "",
+      }
+    },
+    computed: {
+      sortedArray: function () {
+        return this.categories.sort((a, b) => a.updatedAt > b.updatedAt)
       }
     },
     methods: {
@@ -130,7 +160,20 @@
           description: this.descriptionInput,
           color: this.colorInput
         })
+
+        this.categories.push(newCategory)
+        this.nameInput = ""
+        this.descriptionInput= ""
+        this.colorInput= ""
+      },
+
+      onSwipe(e) {
+        console.log('swipe successfully', e)
+      },
+      del(category) {
+        console.log('clicked')
       }
-    }
+    },
   }
+
 </script>

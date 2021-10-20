@@ -3,3 +3,4 @@
 alpha/
 api/node_modules
 api/prisma/migrations
+app/yarn.lock

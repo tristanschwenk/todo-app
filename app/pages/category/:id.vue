@@ -1,39 +1,61 @@
 <template>
   <div>
-    <div class="title">
-      <div class="line-color" :style="{backgroundColor: category.color}"></div>
-      <h1><span class="light">{{category.title}}</span></h1>
-      <div class="line-color" :style="{backgroundColor: category.color}"></div>
-    </div>
+    <Header :smallHeader='true' />
+    <div class="content">
+      <div class="title">
+        <div class="line-color" :style="{backgroundColor: category.color}"></div>
+        <h1><span class="light">{{category.title}}</span></h1>
+        <div class="line-color" :style="{backgroundColor: category.color}"></div>
+      </div>
 
-    <div class="todo-list">
-      <div class="todo" :class="{checked: note.checked}" v-for="(note, index) in notesunChecked" :key="note.id" @click.prevent="clickNote(index)">
-        <p>{{note.text}}</p>
-        <div class="icon"></div>
+      <div class="todo input-card">
+        <input v-model="text" type="text" placeholder="Entrez votre rappel..." @keyup.enter="addNote">
+      </div>
+
+      <div class="card">
+        <transition-group name="fade">
+          <div class="todo" :class="{checked: note.checked}" v-for="(note, index) in notesunChecked" :key="note.id"
+            @click.prevent="clickNote(index, true)">
+            <p>{{note.text}}</p>
+            <div class="icon"></div>
+          </div>
+        </transition-group>
+      </div>
+
+      <div class="card">
+        <transition-group name="fade">
+          <div class="todo" :class="{checked: note.checked}" v-for="(note, index) in notesChecked" :key="note.id"
+            @click.prevent="clickNote(index, false)">
+            <p>{{note.text}}</p>
+            <div class="icon"></div>
+          </div>
+        </transition-group>
+      </div>
+
+      <div class="card">
+        <button class="delete-button" @click.prevent="delCategory">
+          <icon-bin width="15" height="15" style="margin-right: .2em;" />Delete Category</button>
       </div>
     </div>
 
-    <div class="todo input-card">
-      <input v-model="text" type="text" placeholder="Entrez votre rappel..." @keyup.enter="addNote">
-    </div>
 
-    <div class="todo-list">
-      <div class="todo" :class="{checked: note.checked}" v-for="(note, index) in notesChecked" :key="note.id" @click.prevent="clickNote(index)">
-        <p>{{note.text}}</p>
-        <div class="icon"></div>
-      </div>
-    </div>
   </div>
 </template>
 
 <style lang="scss">
-  .input-card input {
-    width: 100%;
-    border: none;
-    border-radius: 10px;
-    background-color: #f3f3f3;
-    font-family: 'Dosis', 'sans-serif';
-    font-size: 18px;
+  .input-card {
+    margin-top: 50px !important;
+
+    input {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      background-color: #f3f3f3;
+      font-family: 'Dosis', 'sans-serif';
+      font-size: 18px;
+
+    }
+
   }
 
   .todo {
@@ -67,9 +89,7 @@
     }
   }
 
-  .todo-list {
-    margin-top: 50px;
-
+  .card {
     .checked {
       opacity: 50%;
       text-decoration-line: line-through;
@@ -82,11 +102,34 @@
     }
   }
 
+  .delete-button {
+    margin: auto;
+    background-color: #ff6b6b;
+    color: white;
+    font-size: 1em;
+    padding: .7em;
+    border-radius: 1em;
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    transition: all .2s;
+    box-sizing: border-box;
+
+    &:active {
+      background: #e25e5e;
+    }
+  }
+
 </style>
 
 <script>
+  import Header from '../../components/Header.vue'
   export default {
+    components: {
+      Header
+    },
     layout: 'main',
+    transition: 'slide-left',
 
     async asyncData({
       $axios,
@@ -107,13 +150,13 @@
       window.vueInstance = this
     },
     computed: {
-      notesChecked: function() {
-        return this.category.notes.filter((el)=> {
+      notesChecked: function () {
+        return this.category.notes.filter((el) => {
           return el.checked
         })
       },
-      notesunChecked: function() {
-        return this.category.notes.filter((el)=> {
+      notesunChecked: function () {
+        return this.category.notes.filter((el) => {
           return !el.checked
         })
       }
@@ -127,17 +170,34 @@
 
         const newNote = await this.$axios.post("/api/notes/", data)
 
-        this.category.notes.push(newNote.data)
+        this.notesunChecked.push(newNote.data)
         console.log(this.category.notes)
         this.text = ""
       },
-      async clickNote(index) {
-        this.category.notes[index].checked = !this.category.notes[index].checked
-        const update = await this.$axios.patch(`/api/notes/${this.category.notes[index].id}`, {
-          checked: this.category.notes[index].checked
-        })
+      async clickNote(index, check) {
+        let update
+        if (check) {
+          console.log(!this.notesunChecked[index].checked);
+          update = await this.$axios.patch(`/api/notes/${this.notesunChecked[index].id}`, {
+            checked: !this.notesunChecked[index].checked
+          })
+          this.notesunChecked[index].checked = !this.notesunChecked[index].checked
 
-        console.log(update)
+        } else {
+          console.log(!this.notesChecked[index].checked);
+          update = await this.$axios.patch(`/api/notes/${this.notesChecked[index].id}`, {
+            checked: !this.notesChecked[index].checked
+          })
+          this.notesChecked[index].checked = !this.notesChecked[index].checked
+
+        }
+        console.log(update);
+      },
+
+      async delCategory() {
+        const deletedCategory = await this.$axios.delete(`/api/category/${this.category.id}`)
+
+        this.$router.push("/")
       }
     }
   }

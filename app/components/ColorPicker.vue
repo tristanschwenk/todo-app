@@ -57,19 +57,19 @@
       return {
         colors: [{
             name: "blue",
-            code: "#4ecdc4"
+            code: "#79addc"
           },
           {
             name: "green",
-            code: "#1a535c"
+            code: "#92d69a"
           },
           {
             name: "yellow",
-            code: "#ffe66d"
+            code: "#ffee93"
           },
           {
-            name: "red",
-            code: "#ff6b6b"
+            name: "orange",
+            code: "#fcb995"
           },
         ]
       }

@@ -47,12 +47,16 @@ export default {
   proxy: {
     '/api/': {
       target: 'http://localhost:3001',
-      pathRewrite: { '^/api/': '' }
+      pathRewrite: { '^/api/': '/' }
     }
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-
+    extend(config, ctx) {}
+  },
+  server: {
+    host: "0.0.0.0"
   }
+
 }

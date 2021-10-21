@@ -1,4 +1,6 @@
 const express = require('express')
+const Cron = require('./cron')
+
 
 const app = express()
 
@@ -17,5 +19,6 @@ app.all("/", (req, res) => {
 
 app.listen(3001, () => {
   console.log("Server is running");
+  Cron.start()
 })
 

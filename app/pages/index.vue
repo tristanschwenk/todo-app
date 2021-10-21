@@ -152,6 +152,9 @@
         return this.categories.sort((a, b) => a.updatedAt > b.updatedAt)
       }
     },
+    mounted() {
+      window.vueInstance = this
+    },
     methods: {
       async createCategory() {
         console.log(this.nameInput, this.descriptionInput, this.colorInput)

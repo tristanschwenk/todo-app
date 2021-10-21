@@ -12,7 +12,7 @@ export default {
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      // { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
 
@@ -31,6 +31,7 @@ export default {
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
+    '@nuxtjs/pwa',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -55,8 +56,28 @@ export default {
   build: {
     extend(config, ctx) {}
   },
+
   server: {
     host: "0.0.0.0"
+  },
+
+  pwa: {
+    icon: {
+      fileName: "icon.png"
+    },
+    meta: {
+      mobileAppIOS: true,
+      name: "ToDo App",
+      author: "Tristan SCHWENK",
+      description: "An elegent Todo App to keep things in your mind. Simple design to keep you focus on what is important.",
+      lang: "fr"
+    },
+    manifest: {
+      name: 'ToDo App',
+      short_name: 'ToDo',
+      lang: 'fr',
+      description: "An elegent Todo App to keep things in your mind. Simple design to keep you focus on what is important.",
+    },
   }
 
 }
